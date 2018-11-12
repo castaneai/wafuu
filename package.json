@@ -1,0 +1,19 @@
+{
+  "name": "wafuu",
+  "version": "0.0.1",
+  "description": "WAFUU INTENSIFIES (>ω&lt;)",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/castaneai/wafuu.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/castaneai/wafuu/issues"
+  },
+  "homepage": "https://github.com/castaneai/wafuu#readme",
+  "dependencies": {
+    "mastodon-api": "^1.3.0"
+  }
+}
