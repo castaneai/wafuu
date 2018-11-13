@@ -1,5 +1,7 @@
 const Mastodon = require('mastodon-api');
 const readline = require('readline');
+const slack = require('slack-incoming-webhook')({url: process.env.SLACK_WEBHOOK_URL});
+const core = require('./core');
 
 const baseUrl = 'https://pawoo.net';
 const apiUrl = `${baseUrl}/api/v1/`;
@@ -16,31 +18,22 @@ const getAccessToken = async () => {
     });
 }
 
-const extractData = (data) => {
-    if (data.reblog !== null) {
-        return extractData(data.reblog);
-    }
-    return {
-        account: data.account,
-        uri: data.uri,
-        sensitive: data.sensitive,
-        mediaAttachments: data.media_attachments,
-        tags: data.tags,
-    }
-};
-
 const main = async (accessToken) => {
     const client = new Mastodon({access_token: accessToken, api_url: apiUrl});
     const stream = client.stream('streaming/user');
     console.log('streaming start...');
     stream.on('message', msg => {
-        const payload = extractData(msg.data);
-        console.log(payload);
+        if (!core.isWafuuablePawooPost(msg.data)) {
+            return;
+        }
+        const slackPayload = core.pawooPostToSlackMessage(msg.data);
+        console.log(`[wafuu]: ${msg.data.uri}`);
+        slack('', slackPayload)
     });
     stream.on('error', err => {
         console.error(err);
     });
 }
 
-const accessToken = process.env.ACCESS_TOKEN;
+const accessToken = process.env.WAFUU_ACCESS_TOKEN;
 main(accessToken);
